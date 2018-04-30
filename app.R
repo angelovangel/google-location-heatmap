@@ -1,11 +1,19 @@
 # app based on processing json files from google
+
+#check if required packages are there and suggest install if not
+packages <- c("shiny", "shinyjs", "tidyverse", "leaflet.extras", "lubridate")
+lapply(packages, function(x) if(!require(x, character.only = TRUE)) install.packages(x))
+
 library(shiny)
 library(shinyjs)
-#library(data.table)
 library(tidyverse)
 library(leaflet.extras)
 library(lubridate)
 
+#check if required packages are there and suggest install if not
+packages <- c("shiny", "shinyjs", "tidyverse", "leaflet.extras", "lubridate")
+
+# this file contains the function needed to process json from google
 source("R/process-google-json.R") #this reads the json file and makes a tibble
 
 
