@@ -4,7 +4,9 @@ Takeout your google location history data and visualize it as a heatmap
 ### What is this
 In case you have a mobile phone with location history enabled (and google maps on it), you should have quite a lot of location history data on google. This Shiny app takes your google location history, which you can download from your [google account](https://takeout.google.com/settings/takeout), and plots it as a heat trace on a map. You can interactively change some of the settings (map opacity, radius and blur of the heatmap) and select the time range you want to see.
 
+
 ![This is me going around Europe:)](img/screenshot1.png)
+
 
 ### How to use
 - First, go to [google takeout](https://takeout.google.com/settings/takeout), select "Location history" (and de-select all the rest), download and unzip the file. What you are going to need is the `LocationHistory.json` file. 
