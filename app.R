@@ -57,7 +57,8 @@ ui <- bootstrapPage(
 )
 
 server <- function(input, output, session) {
-  options(shiny.maxRequestSize=1000*1024^2) 
+  options(shiny.maxRequestSize=1000*1024^2,
+          shiny.launch.browser = TRUE) 
   
   ### read and transform json
   df <- reactive({
