@@ -13,8 +13,8 @@ library(lubridate)
 #check if required packages are there and suggest install if not
 packages <- c("shiny", "shinyjs", "tidyverse", "leaflet.extras", "lubridate")
 
-# this file contains the function needed to process json from google
-source("R/process-google-json.R") #this reads the json file and makes a tibble
+# this file contains the function needed to process json from google 
+source("R/process-google-json.R") # this reads the json file and makes a tibble
 
 
 ui <- bootstrapPage(
@@ -25,6 +25,10 @@ ui <- bootstrapPage(
                 fileInput("file", "",
                           multiple = FALSE,
                           accept = ".json")),
+  
+  absolutePanel(top = 25, left = 400,
+                actionButton("showInfo", label = "Show data info")),
+  
   absolutePanel(top = 10, right = 10,
                 #draggable = TRUE,
                 width = "15%",
@@ -59,6 +63,10 @@ ui <- bootstrapPage(
 server <- function(input, output, session) {
   options(shiny.maxRequestSize=1000*1024^2,
           shiny.launch.browser = TRUE) 
+  # this stops the app when user closes browser window
+  session$onSessionEnded(function() {
+    stopApp()
+  })
   
   ### read and transform json
   df <- reactive({
@@ -168,6 +176,19 @@ server <- function(input, output, session) {
     updateDateRangeInput(session, "daterange", 
                          min = (min(df()$time) - days()) %>% floor_date(unit = "days"),
                          max = today() + days(30))
+  })
+  
+  ### observer and modal for showInfo
+  observeEvent(input$showInfo, {
+    if(!is.null(input$file)) {
+    showModal(modalDialog(title = "Your data in numbers",
+                          paste0("Your location data has ",nrow(df()) , " entries collected between ",
+                                 as_date(min(df()$time)), " and ", as_date(max(df()$time)))))
+    } else {
+      showModal(modalDialog(title = "Your data in numbers",
+                            paste0("Still no data loaded...")))
+    }
+    
   })
 
 }
