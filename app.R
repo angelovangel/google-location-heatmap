@@ -182,19 +182,29 @@ server <- function(input, output, session) {
     if(!is.null(input$file)) {
     showModal(modalDialog(title = "Your data in numbers",
                             HTML(
-                            paste0("Your location data has ", 
+                            paste0("The location data has ", 
                                  "<b>", nrow(df()) , "</b>",
                                  " entries <br> collected between ",
                                  "<b>", as_date(min(df()$time)), "</b>",
                                  " and ", 
-                                 "<b>", as_date(max(df()$time))
+                                 "<b>", as_date(max(df()$time)), "<hr/>"
                                  )
                                 ),
+                          renderPlot(
+                            df() %>% ggplot() + 
+                                  geom_freqpoly(aes(time), color = "red", bins = 50, size = 1) + 
+                                  labs(title = "Frequency of location data points over time") + 
+                                  xlab("") +
+                                  theme_bw(),
+                              
+                          res = 100),
                           easyClose = TRUE
                           ))
     } else {
       showModal(modalDialog(title = "Your data in numbers",
-                            HTML("Still no data loaded...please wait")))
+                            HTML("Still no data loaded...")
+                            )
+                )
     }
     
   })
