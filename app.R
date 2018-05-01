@@ -22,17 +22,16 @@ ui <- bootstrapPage(
   tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
   leafletOutput("map", width = "100%", height = "100%"),
   absolutePanel(top = 10, left = 10,
+                width = "20%",
                 fileInput("file", "",
                           multiple = FALSE,
                           accept = ".json")),
   
-  absolutePanel(top = 25, left = 400,
-                actionButton("showInfo", label = "Show data info")),
-  
   absolutePanel(top = 10, right = 10,
                 #draggable = TRUE,
                 width = "15%",
-                dateRangeInput("daterange", "Date range", 
+                actionButton("showInfo", label = "Show data info"),
+                dateRangeInput("daterange", "", 
                                start = today() - years(1),
                                end = today()
                                
@@ -182,11 +181,20 @@ server <- function(input, output, session) {
   observeEvent(input$showInfo, {
     if(!is.null(input$file)) {
     showModal(modalDialog(title = "Your data in numbers",
-                          paste0("Your location data has ",nrow(df()) , " entries collected between ",
-                                 as_date(min(df()$time)), " and ", as_date(max(df()$time)))))
+                            HTML(
+                            paste0("Your location data has ", 
+                                 "<b>", nrow(df()) , "</b>",
+                                 " entries <br> collected between ",
+                                 "<b>", as_date(min(df()$time)), "</b>",
+                                 " and ", 
+                                 "<b>", as_date(max(df()$time))
+                                 )
+                                ),
+                          easyClose = TRUE
+                          ))
     } else {
       showModal(modalDialog(title = "Your data in numbers",
-                            paste0("Still no data loaded...")))
+                            HTML("Still no data loaded...please wait")))
     }
     
   })
