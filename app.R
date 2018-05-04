@@ -144,7 +144,7 @@ server <- function(input, output, session) {
     )
     })
     
-  ### observer to update daterange
+  ### observer for notifications
   observe({
     validate(
       need(expr = !is.null(input$file), "Please upload a json file first")
