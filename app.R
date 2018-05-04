@@ -1,8 +1,9 @@
 # app based on processing json files from google
 
 #check if required packages are there and suggest install if not
-packages <- c("shiny", "shinyjs", "tidyverse", "leaflet.extras", "lubridate")
+packages <- c("shiny", "shinyjs", "tidyverse", "leaflet.extras", "lubridate", "RJSONIO")
 lapply(packages, function(x) if(!require(x, character.only = TRUE)) install.packages(x))
+
 
 library(shiny)
 library(shinyjs)
