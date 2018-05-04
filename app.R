@@ -1,9 +1,13 @@
 # app based on processing json files from google
 
 #check if required packages are there and suggest install if not
-packages <- c("shiny", "shinyjs", "tidyverse", "leaflet.extras", "lubridate", "RJSONIO")
+packages <- c("shiny", "shinyjs", "tidyverse", "lubridate", "RJSONIO", "devtools")
 lapply(packages, function(x) if(!require(x, character.only = TRUE)) install.packages(x))
 
+# leaflet has to be devel version
+if (packageVersion("leaflet") < "2.0.0.9000") {
+  devtools::install_github("rstudio/leaflet")
+}
 
 library(shiny)
 library(shinyjs)

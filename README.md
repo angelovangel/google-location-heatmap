@@ -21,4 +21,5 @@ Cheers!
 Angel
 
 #### Note
-The app checks if you have the required libraries and installs them if you don't (I know this is not a good practice, but so it is easier for less experienced users). These are `shiny`, `shinyjs`, `tidyverse`, `leaflet.extras` and `lubridate`. 
+The app checks if you have the required libraries and installs them if you don't (I know this is not a good practice, but so it is easier for less experienced users). These are `shiny`, `shinyjs`, `tidyverse`, `leaflet` and `lubridate`. You will need the development version of `leaflet` from GitHub, with the current official version the controls are not working (when you start, the app will try to install the version needed). 
+
