@@ -128,12 +128,13 @@ server <- function(input, output, session) {
     updateSliderInput(session, "animate", min = input$daterange[1], max = input$daterange[2])
     ifelse(input$animatehistory,
     #yes
-     leafletProxy("map", data = points()) %>%
+     leafletProxy("map") %>%
        clearHeatmap() %>%
        addHeatmap(lng = ~lng, lat = ~lat,
                   blur = input$blur,
                   max = 0.5,
-                  radius = input$radius),
+                  radius = input$radius,
+                  data = points()),
     #   
     #no
     leafletProxy("map", data = filteredData()) %>%
