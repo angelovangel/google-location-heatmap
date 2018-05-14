@@ -103,9 +103,7 @@ server <- function(input, output, session) {
    })
   
   output$map <- renderLeaflet({
-    # Use leaflet() here, and only include aspects of the map that
-    # won't need to change dynamically (at least, not unless the
-    # entire map is being torn down and recreated).
+    
     filteredData() %>% leaflet() %>% 
       fitBounds(~min(lng), ~min(lat), ~max(lng), ~max(lat))
   })
