@@ -12,7 +12,7 @@ In case you have a mobile phone with location history enabled (and google maps o
 - First, go to [google takeout](https://takeout.google.com/settings/takeout), select "Location history" (and de-select all the rest), download and unzip the file. What you are going to need is the `LocationHistory.json` file. 
 - In [RStudio](https://www.rstudio.com/), run
 
-`runGitHub("google-location-heatmap", "angelovangel")`
+`shiny::runGitHub("google-location-heatmap", "angelovangel")`
 
 If you don't have `shiny` installed, do it with `install.packages("shiny")` before doing the above. The app should open in a browser window on your computer. Note that the processing of your `json` file may take a while, depending on its size and the power of your machine.
 - Of course, you can also manually download this repository, open the `app.R` file and press `Run App` in RStudio.
