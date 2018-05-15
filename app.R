@@ -42,19 +42,19 @@ ui <- bootstrapPage(
               conditionalPanel(condition = "input.showoptions",
                 sliderInput("opacity", "Map opacity", min = 0.1, max = 1, value = 0.5
                 ),
-                sliderInput("radius", "Radius", min = 1, max = 10, step = 1, value = 5
+                sliderInput("radius", "Radius", min = 1, max = 10, step = 1, value = 3
                 ),
-                sliderInput("blur", "Blur", min = 1, max = 20, value = 5
+                sliderInput("blur", "Blur", min = 1, max = 20, value = 4
                 ),
                 
-                checkboxInput("animatehistory", label = "Animate (one week per frame)", value = F),
+                checkboxInput("animatehistory", label = "Animate", value = F),
                   conditionalPanel(condition = "input.animatehistory",
                           #radioButtons("step", "Animation step", choices = c("month", "day"), selected = "day", inline = T),
                           
                     sliderInput("animate", "", min = today() - years(1), max = today(), value = today() - years(1), 
                            timeFormat = "%F",
-                           step = 7,
-                           animate = animationOptions(interval = 1000)
+                           #step = 7,
+                           animate = animationOptions(interval = 300)
                     )
                   )
               )
@@ -96,10 +96,10 @@ server <- function(input, output, session) {
    })
    
    # reactives for animation, 7 days per frame
-   points <- reactive({
+   points_new <- reactive({
      
        filteredData() %>%                             
-         dplyr::filter(as_date(time) <= input$animate & as_date(time) >= input$animate - 7)
+         dplyr::filter(as_date(time) == input$animate)
    })
   
   output$map <- renderLeaflet({
@@ -121,23 +121,31 @@ server <- function(input, output, session) {
   
   
 # This observer updates the animation slider, and draws the heatmap.
-# It uses points() if animation is selected and filteredData() otherwise 
+# It uses points_new() if animation is selected and filteredData() otherwise 
   observe({
     updateSliderInput(session, "animate", min = input$daterange[1], max = input$daterange[2])
     ifelse(input$animatehistory,
     #yes
      leafletProxy("map") %>%
-       clearHeatmap() %>%
-       addHeatmap(lng = ~lng, lat = ~lat,
-                  blur = input$blur,
-                  max = 0.5,
-                  radius = input$radius,
-                  data = points()),
+      clearGroup(group = "newpoints") %>%
+      clearGroup(group = "filteredData") %>%
+      addCircleMarkers(group = "newpoints", lng = ~lng, lat = ~lat,
+                       stroke = FALSE,
+                       opacity = 0.8,
+                       fillOpacity = 0.8,
+                       color = "red",
+                       radius = 5,
+                       data = points_new()) %>%
+      addHeatmap(lng = ~lng, lat = ~lat,
+                 radius = input$radius,
+                 blur = input$blur,
+                 data = points_new()),
     #   
     #no
     leafletProxy("map", data = filteredData()) %>%
       clearHeatmap() %>%
-      addHeatmap(lng = ~lng, lat = ~lat,
+      addHeatmap(group = "filteredData",
+                 lng = ~lng, lat = ~lat,
                  blur = input$blur,
                  max = 0.5,
                  radius = input$radius)
