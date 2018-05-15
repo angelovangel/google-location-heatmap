@@ -54,7 +54,7 @@ ui <- bootstrapPage(
                     sliderInput("animate", "", min = today() - years(1), max = today(), value = today() - years(1), 
                            timeFormat = "%F",
                            #step = 7,
-                           animate = animationOptions(interval = 300)
+                           animate = animationOptions(interval = 200)
                     )
                   )
               )
@@ -127,15 +127,15 @@ server <- function(input, output, session) {
     ifelse(input$animatehistory,
     #yes
      leafletProxy("map") %>%
-      clearGroup(group = "newpoints") %>%
+      #clearGroup(group = "newpoints") %>%
       clearGroup(group = "filteredData") %>%
-      addCircleMarkers(group = "newpoints", lng = ~lng, lat = ~lat,
-                       stroke = FALSE,
-                       opacity = 0.8,
-                       fillOpacity = 0.8,
-                       color = "red",
-                       radius = 5,
-                       data = points_new()) %>%
+      # addCircleMarkers(group = "newpoints", lng = ~lng, lat = ~lat,
+      #                  stroke = FALSE,
+      #                  opacity = 0.8,
+      #                  fillOpacity = 0.8,
+      #                  color = "red",
+      #                  radius = 5,
+      #                  data = points_new() %>% head(1)) %>%
       addHeatmap(lng = ~lng, lat = ~lat,
                  radius = input$radius,
                  blur = input$blur,
@@ -200,7 +200,7 @@ server <- function(input, output, session) {
                                  )
                                 ),
                           renderPlot(
-                            df() %>% ggplot() + 
+                            df() %>% sample_frac(0.2) %>% ggplot() + 
                                   geom_freqpoly(aes(time), color = "red", bins = 50, size = 1) + 
                                   labs(title = "Frequency of location data points over time") + 
                                   xlab("") +
