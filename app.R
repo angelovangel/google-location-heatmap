@@ -177,7 +177,9 @@ server <- function(input, output, session) {
       
       showModal(modalDialog(title = "Your data in numbers",
                             size = "l",
-                            footer = tagList(actionButton("next", ">>"), actionButton("prev", "<<")),
+                            footer = tagList(actionButton("prev", "<<<"), 
+                                             actionButton("next", ">>>"), 
+                                             modalButton("Dismiss")),
                             HTML(
                               paste0("The location data has ", 
                                  "<b>", prettyNum( nrow(df()), big.mark = "," ) , "</b>",
@@ -188,15 +190,22 @@ server <- function(input, output, session) {
                             
                             
                             ),
-                          renderCalheatmap(
-                              calheatmap(x = 'date', 
-                                        y = 'n', 
-                                       data = modaldf, 
-                                       domain = 'month', 
-                                       start = min(modaldf$date), 
-                                       itemName = 'datapoint', previousSelector = '#prev', nextSelector = '#next',
-                                       range = 12) 
-                          ),
+                            renderCalheatmap(
+                              calheatmap(
+                                x = 'date',
+                                y = 'n',
+                                data = modaldf,
+                                domain = 'month',
+                                start = min(modaldf$date),
+                                itemName = 'datapoint',
+                                previousSelector = '#prev',
+                                nextSelector = '#next',
+                                range = 12, 
+                                tooltip = 'true', 
+                                cellSize = 12, 
+                                domainLabelFormat = "%b-%Y"
+                              )
+                            ),
                           easyClose = TRUE
                           )
                 )
