@@ -84,6 +84,18 @@ server <- function(input, output, session) {
     readjson(inFile$datapath)
     
   })
+  
+  observe({
+    validate(
+      need(expr = !is.null(input$file), "Please upload a json file first")
+    )
+    # update DateRangeInput with the min and max values from the uploaded file
+    updateDateRangeInput(session, "daterange", 
+                         start = date( min(df()$time) ),
+                         end = date( max(df()$time) )
+    )
+    
+  })
 
 ### Reactive expression for the data subsetted to the dates the user selected
    filteredData <- reactive({
@@ -95,18 +107,14 @@ server <- function(input, output, session) {
                        time <= input$daterange[2]) 
    })
    
-   # reactives for animation, 7 days per frame
-   points_new <- reactive({
-     
-       filteredData() %>%                             
-         dplyr::filter(as_date(time) == input$animate)
-   })
+   
   
-  output$map <- renderLeaflet({
-    
-    filteredData() %>% leaflet() %>% 
-      fitBounds(~min(lng), ~min(lat), ~max(lng), ~max(lat))
-  })
+   output$map <- renderLeaflet({
+     
+     filteredData() %>% leaflet() 
+     })
+  #     fitBounds(~min(lng), ~min(lat), ~max(lng), ~max(lat))
+  # })
   
   
   # Incremental changes to the map are performed in
@@ -119,39 +127,6 @@ server <- function(input, output, session) {
    
  })
   
-  
-# This observer updates the animation slider, and draws the heatmap.
-# It uses points_new() if animation is selected and filteredData() otherwise 
-  observe({
-    updateSliderInput(session, "animate", min = input$daterange[1], max = input$daterange[2])
-    ifelse(input$animatehistory,
-    #yes
-     leafletProxy("map") %>%
-      #clearGroup(group = "newpoints") %>%
-      clearGroup(group = "filteredData") %>%
-      # addCircleMarkers(group = "newpoints", lng = ~lng, lat = ~lat,
-      #                  stroke = FALSE,
-      #                  opacity = 0.8,
-      #                  fillOpacity = 0.8,
-      #                  color = "red",
-      #                  radius = 5,
-      #                  data = points_new() %>% head(1)) %>%
-      addHeatmap(lng = ~lng, lat = ~lat,
-                 radius = input$radius,
-                 blur = input$blur,
-                 data = points_new()),
-    #   
-    #no
-    leafletProxy("map", data = filteredData()) %>%
-      clearHeatmap() %>%
-      addHeatmap(group = "filteredData",
-                 lng = ~lng, lat = ~lat,
-                 blur = input$blur,
-                 max = 0.5,
-                 radius = input$radius)
-    )
-    })
-    
   ### observer for notifications
   observe({
     validate(
@@ -180,10 +155,6 @@ server <- function(input, output, session) {
                      closeButton = TRUE)
     }
     
-    # update DateRangeInput with the min and max values from the uploaded file
-    updateDateRangeInput(session, "daterange", 
-                         min = (min(df()$time) - days()) %>% floor_date(unit = "days"),
-                         max = today() + days(30))
   })
   
   ### observer and modal for showInfo
