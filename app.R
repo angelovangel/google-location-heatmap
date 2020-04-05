@@ -25,13 +25,13 @@ ui <- bootstrapPage(
   useShinyjs(),
   tags$style(type = "text/css", "html, body {width:100%;height:100%}"),
   leafletOutput("map", width = "100%", height = "100%"),
-  absolutePanel(top = 10, left = 10,
+  absolutePanel(top = 15, left = 15,
                 width = "20%",
                 fileInput("file", "",
                           multiple = FALSE,
                           accept = ".json")),
   
-  absolutePanel(top = 10, right = 10,
+  absolutePanel(top = 15, right = 15,
                 #draggable = TRUE,
                 width = "15%",
                 actionButton("showInfo", label = "Show data info"),
@@ -168,26 +168,32 @@ server <- function(input, output, session) {
   observeEvent(input$showInfo, {
     if(!is.null(input$file)) {
       # observations per day
-      modaldf <- df() %>% mutate(date = date(time)) %>% group_by(date) %>% summarise(n = n())
-    
+      modaldf <- df() %>% mutate(date = date(time)) %>% 
+        group_by(date) %>% 
+        summarise(n = n()) %>% 
+        mutate(year = year(date))
+      
+      modaldflist <- split(modaldf, modaldf$year)
+      
       showModal(modalDialog(title = "Your data in numbers",size = "l",
                             HTML(
                             paste0("The location data has ", 
-                                 "<b>", nrow(df()) , "</b>",
+                                 "<b>", prettyNum( nrow(df()), big.mark = "," ) , "</b>",
                                  " entries <br> collected between ",
-                                 "<b>", as_date(min(df()$time)), "</b>",
+                                 "<b>", date(min(df()$time)), "</b>",
                                  " and ", 
-                                 "<b>", as_date(max(df()$time)), "<hr/>"
+                                 "<b>", date(max(df()$time)), "<hr/>"
                                  )
                                 ),
                           renderCalheatmap(
-                            calheatmap(x = 'date', 
-                                           y = 'n', 
-                                           data = modaldf, 
-                                           domain = 'month', 
-                                           start = min(modaldf$date), 
-                                           itemName = 'datapoints')
-                            ),
+                              calheatmap(x = 'date', 
+                                        y = 'n', 
+                                       data = modaldf, 
+                                       domain = 'month', 
+                                       start = min(modaldf$date), 
+                                       itemName = 'datapoints', 
+                                       range = 12) 
+                          ),
                           easyClose = TRUE
                           )
                 )
