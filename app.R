@@ -45,19 +45,9 @@ ui <- bootstrapPage(
                 sliderInput("radius", "Radius", min = 1, max = 10, step = 1, value = 3
                 ),
                 sliderInput("blur", "Blur", min = 1, max = 20, value = 4
-                ),
-                
-                checkboxInput("animatehistory", label = "Animate", value = F),
-                  conditionalPanel(condition = "input.animatehistory",
-                          #radioButtons("step", "Animation step", choices = c("month", "day"), selected = "day", inline = T),
-                          
-                    sliderInput("animate", "", min = today() - years(1), max = today(), value = today() - years(1), 
-                           timeFormat = "%F",
-                           #step = 7,
-                           animate = animationOptions(interval = 200)
-                    )
-                  )
+                )
               )
+              
   )
 )
 
@@ -89,12 +79,15 @@ server <- function(input, output, session) {
     validate(
       need(expr = !is.null(input$file), "Please upload a json file first")
     )
+    mindate <- date( min(df()$time) )
+    maxdate <- date( max(df()$time) )
     # update DateRangeInput with the min and max values from the uploaded file
     updateDateRangeInput(session, "daterange", 
-                         start = date( min(df()$time) ),
-                         end = date( max(df()$time) )
-    )
-    
+                         start = mindate,
+                         end = maxdate, 
+                         min = mindate - 30,
+                         max = maxdate + 30
+                         )
   })
 
 ### Reactive expression for the data subsetted to the dates the user selected
@@ -126,6 +119,21 @@ server <- function(input, output, session) {
       addProviderTiles(providers$Stamen.TonerLite,options = tileOptions(opacity = input$opacity))
    
  })
+  
+  observe({
+    leafletProxy("map", data = filteredData()) %>%
+    fitBounds(~min(lng), ~min(lat), ~max(lng), ~max(lat))
+  })
+  
+  observe({
+    leafletProxy("map", data = filteredData() ) %>%
+    clearHeatmap() %>%
+      addHeatmap(group = "filteredData",
+                 lng = ~lng, lat = ~lat,
+                 blur = input$blur,
+                 max = 0.5,
+                 radius = input$radius)
+  })
   
   ### observer for notifications
   observe({
