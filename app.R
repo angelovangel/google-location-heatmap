@@ -13,7 +13,9 @@ library(shiny)
 library(shinyjs)
 library(tidyverse)
 library(leaflet.extras)
+library(htmlwidgets)
 library(lubridate)
+library(rChartsCalmap) # install_github("ramnathv/rChartsCalmap")
 
 # this file contains the function needed to process json from google 
 source("bin/process-google-json.R") # this reads the json file and makes a tibble
@@ -106,9 +108,6 @@ server <- function(input, output, session) {
      
      filteredData() %>% leaflet() 
      })
-  #     fitBounds(~min(lng), ~min(lat), ~max(lng), ~max(lat))
-  # })
-  
   
   # Incremental changes to the map are performed in
   # an observer. In a later version, the tiles may be changed by user input, so that's why in separate observer
@@ -168,7 +167,10 @@ server <- function(input, output, session) {
   ### observer and modal for showInfo
   observeEvent(input$showInfo, {
     if(!is.null(input$file)) {
-    showModal(modalDialog(title = "Your data in numbers",
+      # observations per day
+      modaldf <- df() %>% mutate(date = date(time)) %>% group_by(date) %>% summarise(n = n())
+    
+      showModal(modalDialog(title = "Your data in numbers",size = "l",
                             HTML(
                             paste0("The location data has ", 
                                  "<b>", nrow(df()) , "</b>",
@@ -178,16 +180,17 @@ server <- function(input, output, session) {
                                  "<b>", as_date(max(df()$time)), "<hr/>"
                                  )
                                 ),
-                          renderPlot(
-                            df() %>% sample_frac(0.2) %>% ggplot() + 
-                                  geom_freqpoly(aes(time), color = "red", bins = 50, size = 1) + 
-                                  labs(title = "Frequency of location data points over time") + 
-                                  xlab("") +
-                                  theme_bw(),
-                              
-                          res = 100),
+                          renderCalheatmap(
+                            calheatmap(x = 'date', 
+                                           y = 'n', 
+                                           data = modaldf, 
+                                           domain = 'month', 
+                                           start = min(modaldf$date), 
+                                           itemName = 'datapoints')
+                            ),
                           easyClose = TRUE
-                          ))
+                          )
+                )
     } else {
       showModal(modalDialog(title = "Your data in numbers",
                             HTML("Still no data loaded...")
