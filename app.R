@@ -175,23 +175,26 @@ server <- function(input, output, session) {
       
       modaldflist <- split(modaldf, modaldf$year)
       
-      showModal(modalDialog(title = "Your data in numbers",size = "l",
+      showModal(modalDialog(title = "Your data in numbers",
+                            size = "l",
+                            footer = tagList(actionButton("next", ">>"), actionButton("prev", "<<")),
                             HTML(
-                            paste0("The location data has ", 
+                              paste0("The location data has ", 
                                  "<b>", prettyNum( nrow(df()), big.mark = "," ) , "</b>",
                                  " entries <br> collected between ",
                                  "<b>", date(min(df()$time)), "</b>",
                                  " and ", 
-                                 "<b>", date(max(df()$time)), "<hr/>"
-                                 )
-                                ),
+                                 "<b>", date(max(df()$time)), "<hr/>")
+                            
+                            
+                            ),
                           renderCalheatmap(
                               calheatmap(x = 'date', 
                                         y = 'n', 
                                        data = modaldf, 
                                        domain = 'month', 
                                        start = min(modaldf$date), 
-                                       itemName = 'datapoints', 
+                                       itemName = 'datapoint', previousSelector = '#prev', nextSelector = '#next',
                                        range = 12) 
                           ),
                           easyClose = TRUE
@@ -199,7 +202,9 @@ server <- function(input, output, session) {
                 )
     } else {
       showModal(modalDialog(title = "Your data in numbers",
-                            HTML("Still no data loaded...")
+                            HTML("Still no data loaded..."), 
+                            footer =tagList(actionButton("next", ">>"), actionButton("prev", "<<"))
+                            
                             )
                 )
     }
