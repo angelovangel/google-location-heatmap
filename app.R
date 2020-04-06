@@ -202,7 +202,7 @@ server <- function(input, output, session) {
                                 nextSelector = '#next',
                                 range = 12, 
                                 tooltip = 'true', 
-                                cellSize = 12, 
+                                cellSize = 11, 
                                 domainLabelFormat = "%b-%Y"
                               )
                             ),

@@ -4,9 +4,10 @@
 #################################
 
 #library(jsonlite) # RJSONIO is faster (18.3 vs 99 sec for this dataset) 
-library(RJSONIO)
-#library(lubridate)
-#library(tidyverse)
+require(RJSONIO)
+require(dplyr)
+require(purrr)
+#require()
 
 
 readjson <- function(x) {
